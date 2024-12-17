@@ -80,21 +80,21 @@ class OllamaChatCompletions(requester.LLMAPIRequester):
     async def _make_msg(
             self,
             chat_completions: ollama.ChatResponse) -> llm_entities.Message:
-        message: ollama.Message = chat_completions.message
+        message: ollama.Message = chat_completions['message']
         if message is None:
             raise ValueError("chat_completions must contain a 'message' field")
 
         ret_msg: llm_entities.Message = None
 
-        if message.content is not None:
+        if message['content'] is not None:
             ret_msg = llm_entities.Message(
                 role="assistant",
-                content=message.content
+                content=message['content']
             )
-        if message.tool_calls is not None and len(message.tool_calls) > 0:
+        if 'tool_calls' in message and message['tool_calls'] is not None and len(message['tool_calls']) > 0:
             tool_calls: list[llm_entities.ToolCall] = []
 
-            for tool_call in message.tool_calls:
+            for tool_call in message['tool_calls']:
                 tool_calls.append(llm_entities.ToolCall(
                     id=uuid.uuid4().hex,
                     type="function",
